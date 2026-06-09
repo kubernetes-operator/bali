@@ -1,0 +1,32 @@
+# FastAPI Deployment
+# API 컨테이너를 K8s Pod로 배포한다
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: api
+  namespace: demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: api
+  template:
+    metadata:
+      labels:
+        app: api
+    spec:
+      containers:
+        - name: api
+          image: demo-app-api:latest
+          imagePullPolicy: Never        # 로컬 이미지 사용 (minikube/kind)
+          ports:
+            - containerPort: 8000
+          envFrom:
+            - configMapRef:
+                name: api-config
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 10
+            periodSeconds: 10
