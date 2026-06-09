@@ -1,0 +1,37 @@
+# PostgreSQL StatefulSet
+# DB는 상태를 유지해야 하므로 StatefulSet으로 배포한다
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: postgres
+  namespace: demo-app
+spec:
+  serviceName: postgres
+  replicas: 1
+  selector:
+    matchLabels:
+      app: postgres
+  template:
+    metadata:
+      labels:
+        app: postgres
+    spec:
+      containers:
+        - name: postgres
+          image: postgres:15-alpine
+          ports:
+            - containerPort: 5432
+          env:
+            - name: POSTGRES_DB
+              value: demoapp
+            - name: POSTGRES_USER
+              value: demouser
+            - name: POSTGRES_PASSWORD
+              value: demopassword   # 실운영 시 Secret으로 교체
+          volumeMounts:
+            - name: postgres-data
+              mountPath: /var/lib/postgresql/data
+      volumes:
+        - name: postgres-data
+          persistentVolumeClaim:
+            claimName: postgres-pvc
