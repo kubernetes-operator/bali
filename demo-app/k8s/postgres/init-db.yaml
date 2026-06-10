@@ -1,0 +1,31 @@
+# DB 초기화 Job
+# K8s 클러스터 내부에서 init_db.py를 실행한다
+# 클러스터 내부이므로 postgres Service DNS(postgres:5432)로 접근 가능
+#
+# 실행 방법:
+#   kubectl apply -f k8s/postgres/init-db-job.yaml -n demo-app
+#   kubectl logs job/init-db -n demo-app        # 결과 확인
+#   kubectl delete job init-db -n demo-app      # 완료 후 정리
+ 
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: init-db
+  namespace: demo-app
+spec:
+  # 실패 시 최대 3번 재시도
+  backoffLimit: 3
+  template:
+    spec:
+      # Job은 완료 후 재시작하지 않는다
+      restartPolicy: Never
+      containers:
+        - name: init-db
+          # API 이미지를 재사용 (init_db.py가 포함되어 있음)
+          image: registry.local.cloud:5000/api:202606090002
+          imagePullPolicy: Never
+          # init_db 모듈을 직접 실행
+          command: ["python", "-m", "models.init_db"]
+          env:
+            - name: DATABASE_URL
+              value: "postgresql://demouser:demopassword@postgres:5432/demoapp"
