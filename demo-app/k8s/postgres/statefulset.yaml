@@ -1,13 +1,19 @@
 # PostgreSQL StatefulSet
-# DB는 상태를 유지해야 하므로 StatefulSet으로 배포한다
+# DB는 상태(데이터)를 유지해야 하므로 Deployment가 아닌 StatefulSet을 사용한다
+# StatefulSet은 Pod 이름이 고정되어 (postgres-0) 안정적인 네트워크 식별자를 제공한다
+
 apiVersion: apps/v1
 kind: StatefulSet
 metadata:
   name: postgres
   namespace: demo-app
+  labels:
+    app: postgres
+    tier: db
 spec:
-  serviceName: postgres
+  # DB는 단일 인스턴스로 운영 (replicas > 1은 별도 HA 구성 필요)
   replicas: 1
+  serviceName: postgres   # Headless Service 이름과 일치해야 한다
   selector:
     matchLabels:
       app: postgres
@@ -15,22 +21,83 @@ spec:
     metadata:
       labels:
         app: postgres
+        tier: db
     spec:
+      # 컨테이너 정의
       containers:
         - name: postgres
+          # Alpine 기반 경량 이미지 사용 (약 240MB)
           image: postgres:15-alpine
+          imagePullPolicy: IfNotPresent
           ports:
-            - containerPort: 5432
+            - name: postgres
+              containerPort: 5432
+              protocol: TCP
+
+          # Secret에서 환경변수를 주입한다
           env:
-            - name: POSTGRES_DB
-              value: demoapp
             - name: POSTGRES_USER
-              value: demouser
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_USER
             - name: POSTGRES_PASSWORD
-              value: demopassword   # 실운영 시 Secret으로 교체
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_PASSWORD
+            - name: POSTGRES_DB
+              valueFrom:
+                secretKeyRef:
+                  name: postgres-secret
+                  key: POSTGRES_DB
+            # 데이터 파일 저장 경로 (PVC 마운트 경로와 일치)
+            - name: PGDATA
+              value: /var/lib/postgresql/data/pgdata
+
+          # 볼륨 마운트: PVC를 데이터 디렉토리에 연결
           volumeMounts:
             - name: postgres-data
               mountPath: /var/lib/postgresql/data
+
+          # Liveness Probe: 30초 후부터 10초마다 DB 응답 확인
+          # 응답 없으면 Pod를 재시작한다
+          livenessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+                - -d
+                - $(POSTGRES_DB)
+            initialDelaySeconds: 30
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+
+          # Readiness Probe: Pod가 트래픽을 받을 준비가 되었는지 확인
+          readinessProbe:
+            exec:
+              command:
+                - pg_isready
+                - -U
+                - $(POSTGRES_USER)
+                - -d
+                - $(POSTGRES_DB)
+            initialDelaySeconds: 5
+            periodSeconds: 5
+            timeoutSeconds: 3
+
+          # 리소스 제한 — 개발 환경 기준 (운영 시 조정 필요)
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "512Mi"
+              cpu: "500m"
+
+      # PVC를 볼륨으로 연결
       volumes:
         - name: postgres-data
           persistentVolumeClaim:
