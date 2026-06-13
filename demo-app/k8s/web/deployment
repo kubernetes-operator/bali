@@ -1,0 +1,23 @@
+# React Deployment
+# Nginx로 서빙되는 React 앱을 K8s Pod로 배포한다
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: web
+  namespace: demo-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: web
+  template:
+    metadata:
+      labels:
+        app: web
+    spec:
+      containers:
+        - name: web
+          image: demo-app-web:latest
+          imagePullPolicy: Never        # 로컬 이미지 사용
+          ports:
+            - containerPort: 80
