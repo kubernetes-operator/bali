@@ -1,0 +1,108 @@
+// 로그인 페이지 컴포넌트
+// username/password를 입력받아 API에 로그인 요청을 보낸다
+// 성공 시 부모 컴포넌트(App)에 토큰과 사용자명을 전달한다
+
+import { useState } from "react";
+import { authAPI } from "../api/client";
+import styles from "./Login.module.css";
+
+function Login({ onLogin }) {
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+  const [error, setError]       = useState("");
+  const [loading, setLoading]   = useState(false);
+
+  // 로그인 버튼 클릭 핸들러
+  const handleLogin = async () => {
+    // 입력값 유효성 검사
+    if (!username.trim() || !password.trim()) {
+      setError("아이디와 비밀번호를 모두 입력해주세요.");
+      return;
+    }
+
+    setLoading(true);
+    setError("");
+
+    try {
+      const res = await authAPI.login(username, password);
+      // 성공: 부모 컴포넌트에 토큰과 사용자명 전달
+      onLogin(res.data.access_token, res.data.username);
+    } catch (err) {
+      // 실패: 서버 메시지 또는 기본 메시지 표시
+      setError(
+        err.response?.data?.detail || "로그인에 실패했습니다. 다시 시도해주세요."
+      );
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  // Enter 키 입력 시 로그인 시도
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter") handleLogin();
+  };
+
+  return (
+    <div className={styles.container}>
+      <div className={styles.card}>
+
+        {/* 헤더 */}
+        <div className={styles.header}>
+          <div className={styles.logo}>N</div>
+          <h1 className={styles.title}>메모 앱</h1>
+          <p className={styles.subtitle}>로그인하여 메모를 관리하세요</p>
+        </div>
+
+        {/* 입력 폼 */}
+        <div className={styles.form}>
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="username">아이디</label>
+            <input
+              id="username"
+              type="text"
+              placeholder="아이디를 입력하세요"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              onKeyDown={handleKeyDown}
+              autoFocus
+              autoComplete="username"
+            />
+          </div>
+
+          <div className={styles.field}>
+            <label className={styles.label} htmlFor="password">비밀번호</label>
+            <input
+              id="password"
+              type="password"
+              placeholder="비밀번호를 입력하세요"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              onKeyDown={handleKeyDown}
+              autoComplete="current-password"
+            />
+          </div>
+
+          {/* 오류 메시지 */}
+          {error && <p className={styles.error}>{error}</p>}
+
+          {/* 로그인 버튼 */}
+          <button
+            className={styles.button}
+            onClick={handleLogin}
+            disabled={loading}
+          >
+            {loading ? "로그인 중..." : "로그인"}
+          </button>
+        </div>
+
+        {/* 테스트 계정 안내 */}
+        <p className={styles.hint}>
+          테스트 계정: <span className={styles.hintCode}>admin</span> / <span className={styles.hintCode}>password123</span>
+        </p>
+
+      </div>
+    </div>
+  );
+}
+
+export default Login;

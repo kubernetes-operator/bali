@@ -22,10 +22,11 @@ spec:
       containers:
         - name: init-db
           # API 이미지를 재사용 (init_db.py가 포함되어 있음)
-          image: registry.local.cloud:5000/api:202606090002
-          imagePullPolicy: Never
+          image: registry.local.cloud:5000/demo-app-api:latest
+            #          imagePullPolicy: Never
           # init_db 모듈을 직접 실행
           command: ["python", "-m", "models.init_db"]
           env:
             - name: DATABASE_URL
+              #              value: "postgresql://admin:password123@postgres:5432/demoapp"
               value: "postgresql://demouser:demopassword@postgres:5432/demoapp"
