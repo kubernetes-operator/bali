@@ -1,0 +1,54 @@
+// 노트 입력 폼 컴포넌트
+// 텍스트를 입력하고 저장 버튼을 누르면 부모 컴포넌트의 onSave를 호출한다
+
+import { useState } from "react";
+import styles from "./NoteForm.module.css";
+
+function NoteForm({ onSave, saving }) {
+  const [content, setContent] = useState("");
+
+  // 저장 핸들러 — 빈 내용은 저장하지 않는다
+  const handleSave = () => {
+    if (!content.trim() || saving) return;
+    onSave(content.trim());
+    setContent(""); // 저장 후 입력창 초기화
+  };
+
+  // Ctrl+Enter로 저장
+  const handleKeyDown = (e) => {
+    if (e.key === "Enter" && (e.ctrlKey || e.metaKey)) handleSave();
+  };
+
+  const remaining = 500 - content.length; // 최대 500자
+
+  return (
+    <div className={styles.wrap}>
+      <textarea
+        className={styles.textarea}
+        rows={3}
+        placeholder="메모를 입력하세요..."
+        value={content}
+        onChange={(e) => {
+          if (e.target.value.length <= 500) setContent(e.target.value);
+        }}
+        onKeyDown={handleKeyDown}
+      />
+      <div className={styles.footer}>
+        {/* 글자 수 카운터 */}
+        <span className={`${styles.counter} ${remaining < 50 ? styles.counterWarn : ""}`}>
+          {remaining}자 남음
+        </span>
+        {/* 저장 버튼 */}
+        <button
+          className={styles.button}
+          onClick={handleSave}
+          disabled={!content.trim() || saving}
+        >
+          {saving ? "저장 중..." : "저장  Ctrl+Enter"}
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export default NoteForm;

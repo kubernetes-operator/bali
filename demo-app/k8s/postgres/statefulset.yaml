@@ -28,7 +28,7 @@ spec:
         - name: postgres
           # Alpine 기반 경량 이미지 사용 (약 240MB)
           image: postgres:15-alpine
-          imagePullPolicy: IfNotPresent
+            #          imagePullPolicy: IfNotPresent
           ports:
             - name: postgres
               containerPort: 5432

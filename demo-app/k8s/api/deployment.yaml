@@ -1,10 +1,15 @@
 # FastAPI Deployment
-# API 컨테이너를 K8s Pod로 배포한다
+# 레지스트리: registry.local.cloud:5000
+# 이미지 빌드: docker build -t registry.local.cloud:5000/demo-app-api:latest ./api
+
 apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: api
   namespace: demo-app
+  labels:
+    app: api
+    tier: backend
 spec:
   replicas: 1
   selector:
@@ -14,19 +19,42 @@ spec:
     metadata:
       labels:
         app: api
+        tier: backend
     spec:
       containers:
         - name: api
-          image: demo-app-api:latest
-          imagePullPolicy: Never        # 로컬 이미지 사용 (minikube/kind)
+          image: registry.local.cloud:5000/demo-app-api:latest
+          # Always: 배포할 때마다 최신 이미지를 pull한다
+          imagePullPolicy: Always
           ports:
             - containerPort: 8000
+
+          # ConfigMap에서 DB 연결 정보를 환경변수로 주입한다
           envFrom:
             - configMapRef:
                 name: api-config
-          livenessProbe:
+
+          # 앱 기동 확인: /health 엔드포인트가 응답하면 트래픽 허용
+          readinessProbe:
             httpGet:
               path: /health
               port: 8000
             initialDelaySeconds: 10
+            periodSeconds: 5
+
+          # 앱 생존 확인: 응답 없으면 Pod 재시작
+          livenessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+            initialDelaySeconds: 20
             periodSeconds: 10
+
+          # 개발 환경 기준 리소스 제한
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "300m"
