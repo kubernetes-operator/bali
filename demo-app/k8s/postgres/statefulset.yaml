@@ -64,12 +64,11 @@ spec:
           # 응답 없으면 Pod를 재시작한다
           livenessProbe:
             exec:
+              # probe의 exec에서는 $(VAR) 치환이 되지 않으므로 sh -c로 환경변수를 펼친다
               command:
-                - pg_isready
-                - -U
-                - $(POSTGRES_USER)
-                - -d
-                - $(POSTGRES_DB)
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             initialDelaySeconds: 30
             periodSeconds: 10
             timeoutSeconds: 5
@@ -78,12 +77,11 @@ spec:
           # Readiness Probe: Pod가 트래픽을 받을 준비가 되었는지 확인
           readinessProbe:
             exec:
+              # probe의 exec에서는 $(VAR) 치환이 되지 않으므로 sh -c로 환경변수를 펼친다
               command:
-                - pg_isready
-                - -U
-                - $(POSTGRES_USER)
-                - -d
-                - $(POSTGRES_DB)
+                - sh
+                - -c
+                - pg_isready -U "$POSTGRES_USER" -d "$POSTGRES_DB"
             initialDelaySeconds: 5
             periodSeconds: 5
             timeoutSeconds: 3
