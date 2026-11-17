@@ -5,28 +5,28 @@ import { useState } from "react";
 
 const S = {
   wrap: {
-    background: "#FFFFFF", border: "1px solid #E4E2DC",
+    background: "var(--ws-panel)", border: "1px solid var(--ws-border)",
     borderRadius: "10px", overflow: "hidden",
   },
   textarea: {
     display: "block", width: "100%", border: "none",
     padding: "14px 16px", resize: "none",
     fontSize: "14px", lineHeight: "1.65",
-    fontFamily: "'Inter', -apple-system, sans-serif",
-    outline: "none", boxSizing: "border-box",
+    fontFamily: "var(--ws-font)",
+    outlineOffset: "2px", boxSizing: "border-box",
     background: "transparent",
   },
   footer: {
     display: "flex", alignItems: "center",
     justifyContent: "space-between",
     padding: "8px 12px 10px",
-    borderTop: "1px solid #E4E2DC", background: "#FAFAF8",
+    borderTop: "1px solid var(--ws-border)", background: "var(--ws-panel)",
   },
-  counter: { fontSize: "12px", color: "#6B6966" },
-  counterWarn: { fontSize: "12px", color: "#DC2626" },
+  counter: { fontSize: "12px", color: "var(--ws-muted)" },
+  counterWarn: { fontSize: "12px", color: "var(--ws-danger)" },
   button: {
-    padding: "6px 14px", background: "#2563EB",
-    color: "#fff", border: "none", borderRadius: "6px",
+    padding: "6px 14px", background: "var(--ws-accent)",
+    color: "var(--ws-on-accent)", border: "none", borderRadius: "6px",
     fontSize: "13px", fontWeight: "500", cursor: "pointer",
     fontFamily: "inherit",
   },

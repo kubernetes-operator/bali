@@ -1,7 +1,6 @@
 /* 전역 스타일 */
 /* 폰트, 리셋, CSS 변수, 공통 유틸리티 클래스를 정의한다 */
 
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap');
 
 /* CSS 변수 — 컬러 팔레트 및 간격 */
 :root {
