@@ -1,0 +1,49 @@
+# Gateway API HTTPRoute — 외부 도메인 → Gateway → web Service(/demo-app 하위)
+# 공개 저장소이므로 실제 도메인은 넣지 않는다. 적용 시 <DOMAIN>을 실제 도메인으로 바꿔서 사용:
+#   sed "s/<DOMAIN>/실제도메인/" httproute.yaml.template | kubectl apply -f -
+# (.template 확장자라 kubectl apply -f k8s/web/ 일괄 적용 대상에서 제외된다)
+
+apiVersion: gateway.networking.k8s.io/v1
+kind: HTTPRoute
+metadata:
+  name: demo-app-route
+  namespace: demo-app
+spec:
+  hostnames:
+    - "<DOMAIN>"
+  parentRefs:
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: gateway
+      namespace: default
+      sectionName: http
+    - group: gateway.networking.k8s.io
+      kind: Gateway
+      name: gateway
+      namespace: default
+      sectionName: https
+  rules:
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /demo-app/static/
+      backendRefs:
+        - name: web
+          namespace: demo-app
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /demo-app/api/
+      backendRefs:
+        - name: web
+          namespace: demo-app
+          port: 80
+    - matches:
+        - path:
+            type: PathPrefix
+            value: /demo-app
+      backendRefs:
+        - name: web
+          namespace: demo-app
+          port: 80
