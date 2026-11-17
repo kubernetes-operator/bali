@@ -5,10 +5,17 @@
 import axios from "axios";
 
 // Axios 인스턴스 생성
-// baseURL: K8s 환경에서는 API Service 주소로 변경 필요
+// 앱 기준 경로: K8s에서는 Gateway(HTTPRoute)와 Nginx가 /demo-app 하위로 서빙한다
+// 로컬 개발(npm start)은 package.json proxy로 /api 를 직접 쓰므로 빈 문자열
+// 빌드 시 REACT_APP_BASE_PATH로 덮어쓸 수 있다
+export const BASE_PATH =
+  process.env.REACT_APP_BASE_PATH ??
+  (process.env.NODE_ENV === "production" ? "/demo-app" : "");
+
+// Axios 인스턴스 생성
+// baseURL: /demo-app → Nginx가 /demo-app/api/* 를 FastAPI의 /api/* 로 프록시한다
 const apiClient = axios.create({
-//  baseURL: process.env.REACT_APP_API_URL || "http://localhost:8000",
-  baseURL: "",
+  baseURL: BASE_PATH,
   headers: { "Content-Type": "application/json" },
   timeout: 10000, // 10초 타임아웃
 });
@@ -33,7 +40,7 @@ apiClient.interceptors.response.use(
       // 토큰 만료 또는 유효하지 않은 토큰 → 자동 로그아웃
       localStorage.removeItem("access_token");
       localStorage.removeItem("username");
-      window.location.href = "/";
+      window.location.href = `${BASE_PATH}/`;
     }
     return Promise.reject(error);
   }

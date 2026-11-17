@@ -23,7 +23,7 @@ spec:
     spec:
       containers:
         - name: web
-          image: registry.local.cloud:5000/demo-app-web:4dbc4ddfa084
+          image: registry.local.cloud:5000/demo-app-web:202611170001
           imagePullPolicy: Always
           ports:
             - containerPort: 80
