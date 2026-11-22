@@ -4,7 +4,7 @@
 
 import { useState, useEffect } from "react";
 import Login from "./pages/Login";
-import Notes from "./pages/Notes";
+import PlatformGate from "./components/PlatformGate";
 
 function App() {
   // localStorage에서 초기 토큰/사용자명을 읽어온다 (새로고침 후 유지)
@@ -31,7 +31,7 @@ function App() {
     <div>
       {token ? (
         // 로그인 상태: 노트 페이지 렌더링
-        <Notes username={username} onLogout={handleLogout} />
+        <PlatformGate key={token} username={username} onLogout={handleLogout} />
       ) : (
         // 비로그인 상태: 로그인 페이지 렌더링
         <Login onLogin={handleLogin} />

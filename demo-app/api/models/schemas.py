@@ -90,3 +90,16 @@ class Note(Base):
 
     def __repr__(self):
         return f"<Note id={self.id} user_id={self.user_id} content={self.content[:20]}>"
+
+
+class UserAccess(Base):
+    """기존 계정·메모와 별개의 웹 역할/페이지/JWT 취소 버전."""
+    __tablename__ = 'web_user_access'
+    user_id = Column(Integer,ForeignKey('users.id',ondelete='CASCADE'),primary_key=True)
+    role = Column(String(16),nullable=False)
+    pages = Column(Text,nullable=True)
+    token_version = Column(Integer,nullable=False,default=0)
+
+class AccessState(Base):
+    __tablename__ = 'web_access_state'
+    id = Column(Integer,primary_key=True)

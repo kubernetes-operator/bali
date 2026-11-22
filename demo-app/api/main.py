@@ -42,3 +42,10 @@ def health_check():
     - DB 연결 없이 앱 기동 여부만 확인한다
     """
     return {"status": "ok", "version": "0.1.0"}
+
+
+@app.on_event('startup')
+def initialize_web_access():
+    from core.web_access import migrate
+    from database import engine
+    migrate(engine)

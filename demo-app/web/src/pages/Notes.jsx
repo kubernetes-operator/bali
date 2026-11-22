@@ -64,7 +64,7 @@ const S = {
   },
 };
 
-function Notes({ username, onLogout }) {
+function Notes({ username, onLogout, canWrite = true }) {
   const [notes, setNotes]     = useState([]);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving]   = useState(false);
@@ -111,9 +111,9 @@ function Notes({ username, onLogout }) {
           <button style={S.logoutBtn} onClick={onLogout}>로그아웃</button>
         </header>
 
-        <section style={S.formSection}>
+        {canWrite && <section style={S.formSection}>
           <NoteForm onSave={handleSave} saving={saving} />
-        </section>
+        </section>}
 
         {error && <p style={S.error}>{error}</p>}
 

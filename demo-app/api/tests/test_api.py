@@ -6,6 +6,8 @@ import pytest
 from fastapi.testclient import TestClient
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
+from sqlalchemy.pool import StaticPool
+from core.web_access import migrate
 
 from main import app
 from database import get_db
@@ -20,6 +22,7 @@ from core.auth_service import hash_password
 TEST_ENGINE = create_engine(
     "sqlite:///:memory:",
     connect_args={"check_same_thread": False},
+    poolclass=StaticPool,
 )
 TestSessionLocal = sessionmaker(
     autocommit=False, autoflush=False, bind=TEST_ENGINE
@@ -67,6 +70,8 @@ def 테스트_사용자():
     db.add(user)
     db.commit()
     db.close()
+    # TestClient는 lifespan을 실행하지 않으므로 기존 사용자에 대한 시작 마이그레이션을 명시한다.
+    migrate(TEST_ENGINE)
     return {"username": "admin", "password": "password123"}
 
 

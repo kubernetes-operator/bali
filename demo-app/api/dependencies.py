@@ -2,7 +2,7 @@
 # JWT 토큰을 검증하고 현재 로그인 사용자를 반환하는 함수를 제공한다
 # 인증이 필요한 모든 엔드포인트에서 Depends(get_current_user)로 사용한다
 
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import HTTPBearer, HTTPAuthorizationCredentials
 from sqlalchemy.orm import Session
 
@@ -15,6 +15,7 @@ bearer_scheme = HTTPBearer()
 
 
 def get_current_user(
+    request: Request,
     credentials: HTTPAuthorizationCredentials = Depends(bearer_scheme),
     db: Session = Depends(get_db),
 ) -> User:
@@ -59,4 +60,8 @@ def get_current_user(
             detail="비활성화된 계정입니다.",
         )
 
+    from core.web_access import access,check
+    if payload.get("ver",0) != access(db,user)["version"]:
+        raise credentials_exception
+    check(db,user,request.url.path,request.method)
     return user

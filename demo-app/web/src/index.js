@@ -6,6 +6,7 @@ import ReactDOM from "react-dom/client";
 import App from "./App";
 import "./index.css";
 import './web-standard.css';
+import './web-standard-auth.js';
 
 const root = ReactDOM.createRoot(document.getElementById("root"));
 root.render(
