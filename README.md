@@ -128,9 +128,9 @@ CREATE TABLE IF NOT EXISTS notes (
 );
 
 # admin 역할 및 계정 생성
-CREATE ROLE admin WITH LOGIN PASSWORD 'password123' SUPERUSER;
+CREATE ROLE admin WITH LOGIN PASSWORD '<DB_관리자_비밀번호>' SUPERUSER;
 INSERT INTO users (username, email, hashed_password, is_active)
-VALUES ('admin', 'admin@demo.local', '$(bcrypt hash of password123)', true);
+VALUES ('admin', 'admin@demo.local', '<관리자_비밀번호의_bcrypt_해시>', true);
 \q
 ```
 
@@ -164,7 +164,7 @@ kubectl apply -f k8s/web/
 
 ```
 http://<워커노드IP>:30000
-테스트 계정: admin / password123
+테스트 계정: 담당자에게 문의 (비밀번호는 문서에 기재하지 않음)
 ```
 
 ---

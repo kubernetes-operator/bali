@@ -107,9 +107,6 @@ function Login({ onLogin }) {
             {loading ? "로그인 중..." : "로그인"}
           </button>
         </div>
-        <p style={S.hint}>
-          테스트 계정: <span style={S.hintCode}>admin</span> / <span style={S.hintCode}>password123</span>
-        </p>
       </div>
     </div>
   );

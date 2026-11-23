@@ -30,7 +30,7 @@ def seed_admin_user() -> None:
     """
     데모용 admin 계정을 삽입한다
     - 이미 존재하면 건너뛴다
-    - 비밀번호: password123 (bcrypt 해시로 저장)
+    - 비밀번호는 bcrypt 해시로 저장한다 (값은 문서/로그에 남기지 않음)
     """
     print("[2/3] 초기 데이터 삽입 중...")
     db = SessionLocal()
@@ -50,7 +50,7 @@ def seed_admin_user() -> None:
         )
         db.add(admin)
         db.commit()
-        print("      admin 계정 생성 완료 (비밀번호: password123)")
+        print("      admin 계정 생성 완료")
     finally:
         db.close()
 

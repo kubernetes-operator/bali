@@ -8,8 +8,8 @@ from typing import Generator
 
 # ----------------------------------------------------------------
 # 환경변수에서 DB 접속 URL을 읽어온다
-# 로컬 개발:  postgresql://demouser:demopassword@localhost:5432/demoapp
-# K8s 환경:   postgresql://demouser:demopassword@postgres:5432/demoapp
+# 로컬 개발:  postgresql://<사용자>:<비밀번호>@localhost:5432/demoapp
+# K8s 환경:   postgresql://<사용자>:<비밀번호>@postgres:5432/demoapp
 #             (postgres = K8s Service 이름)
 # ----------------------------------------------------------------
 DATABASE_URL = os.getenv(

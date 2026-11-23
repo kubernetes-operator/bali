@@ -64,7 +64,7 @@ def 테스트_사용자():
     db = TestSessionLocal()
     user = User(
         username="admin",
-        hashed_password=hash_password("password123"),
+        hashed_password=hash_password("fixture-admin-pass"),
         is_active=True,
     )
     db.add(user)
@@ -72,7 +72,7 @@ def 테스트_사용자():
     db.close()
     # TestClient는 lifespan을 실행하지 않으므로 기존 사용자에 대한 시작 마이그레이션을 명시한다.
     migrate(TEST_ENGINE)
-    return {"username": "admin", "password": "password123"}
+    return {"username": "admin", "password": "fixture-admin-pass"}
 
 
 @pytest.fixture
